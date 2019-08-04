@@ -15,7 +15,7 @@ public class User implements Serializable {
     private String firstName;
     private String lastName;
     private String userName;
-    private String plainTextPassword;
+    private String plainTextPassword = "secure data";
     private String hashedPassword;
 
     public Long getId() {

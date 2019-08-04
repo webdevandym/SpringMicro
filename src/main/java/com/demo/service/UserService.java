@@ -34,6 +34,7 @@ public class UserService {
         }
 
         User user = UserMapper.toEntity(userRegisterRequestVM);
+        user.setHashedPassword(bCryptService.hash(userRegisterRequestVM.getPassword()));
 
         return save(user);
     }
@@ -41,22 +42,19 @@ public class UserService {
     @Transactional(readOnly = true)
     public Boolean checkOnExistsByLogin(String userName) {
         log.debug("Request for verify user exists by login '{}'", userName);
-        return userRepository.existsByUserName(userName);
+        return userRepository.existsByUserName(userName.toLowerCase());
     }
 
     @Transactional
     public User save(User user) {
         log.debug("Request to save user {}", user);
-        if (user.getHashedPassword() == null || user.getHashedPassword().trim().isEmpty()) {
-            hashPassword(user);
-        }
         return userRepository.save(user);
     }
 
     @Transactional(readOnly = true)
     public String verifyAndGenerateToken(UserLoginRequestVM userLoginRequestVM) {
         log.debug("Request to verify user pass and generate token, for user '{}'", userLoginRequestVM);
-        return userRepository.findByUserName(userLoginRequestVM.getUserName())
+        return userRepository.findByUserName(userLoginRequestVM.getUserName().toLowerCase())
                              .map(user -> {
                                  if (!bCryptService.verifyHash(userLoginRequestVM.getPassword(), user.getHashedPassword())) {
                                      throw new BadRequestException("INCORRECT_PASSWORD", "The given password is incorrect");
@@ -66,10 +64,5 @@ public class UserService {
                                  return "TOKEN!";
                              })
                              .orElseThrow(() -> new BadRequestException("USER_NOT_FOUND", "User doesnt exist"));
-    }
-
-    private void hashPassword(User user) {
-        String hash = bCryptService.hash(user.getPlainTextPassword());
-        user.setHashedPassword(hash);
     }
 }

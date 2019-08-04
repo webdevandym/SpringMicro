@@ -10,8 +10,7 @@ public class UserMapper {
         User user = new User();
         user.setFirstName(userRegisterRequestVM.getFirstName());
         user.setLastName(userRegisterRequestVM.getLastName());
-        user.setUserName(userRegisterRequestVM.getUserName());
-        user.setPlainTextPassword(userRegisterRequestVM.getPassword());
+        user.setUserName(userRegisterRequestVM.getUserName().trim().toLowerCase());
 
         return user;
     }
