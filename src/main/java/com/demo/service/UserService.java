@@ -41,7 +41,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public Boolean checkOnExistsByLogin(String userName) {
         log.debug("Request for verify user exists by login '{}'", userName);
-        return userRepository.checkOnExistsByLogin(userName);
+        return userRepository.existsByUserName(userName);
     }
 
     @Transactional
